@@ -12,14 +12,9 @@ export default async function handler(req, res) {
       return res.status(400).json({ error: 'user_id and query required' });
     }
     
-    console.log('Search request:', { user_id, query, limit, threshold });
-    
     // Generate embedding for search query
     const queryEmbedding = await generateEmbedding(query);
-    console.log('Embedding generated, length:', queryEmbedding?.length);
-    
     const formattedEmbedding = formatForPostgres(queryEmbedding);
-    console.log('Formatted embedding preview:', formattedEmbedding.substring(0, 100));
     
     const supabase = createServiceClient();
     
@@ -30,14 +25,18 @@ export default async function handler(req, res) {
       p_user_id: user_id
     });
     
-    console.log('RPC result:', { data, error });
-    
     if (error) throw error;
     
     return res.status(200).json({
       results: data || [],
       query,
-      count: data?.length || 0
+      count: data?.length || 0,
+      debug: {
+        embeddingLength: queryEmbedding?.length,
+        embeddingPreview: formattedEmbedding.substring(0, 80),
+        threshold,
+        user_id
+      }
     });
   } catch (error) {
     console.error('Search error:', error);
