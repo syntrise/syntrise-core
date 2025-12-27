@@ -6,7 +6,7 @@ export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).json({ error: 'Method not allowed' });
   
   try {
-    const { user_id, query, limit = 5, threshold = 0.3 } = req.body;
+    const { user_id, query, limit = 5, threshold = 0.1 } = req.body;
     
     if (!user_id || !query) {
       return res.status(400).json({ error: 'user_id and query required' });
