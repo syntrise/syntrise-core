@@ -1,0 +1,19 @@
+{
+  "name": "syntrise-core",
+  "version": "0.1.0",
+  "description": "Cognitive Layer for Complex Systems — AI-powered memory and context engine",
+  "scripts": {
+    "dev": "vercel dev",
+    "deploy": "vercel --prod"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "@supabase/supabase-js": "^2.47.12",
+    "openai": "^4.77.0"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/syntrise/syntrise-core.git"
+  }
+}
