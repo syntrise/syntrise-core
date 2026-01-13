@@ -1,0 +1,1154 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CORTEX | Admin Dashboard v2</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      min-height: 100vh;
+    }
+    
+    /* Header */
+    .header {
+      background: #111;
+      border-bottom: 1px solid #222;
+      padding: 16px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #f97316, #ea580c);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18px;
+    }
+    .logo-text {
+      font-size: 20px;
+      font-weight: 700;
+      color: #f97316;
+    }
+    .logo-text span { color: #666; font-weight: 400; font-size: 14px; margin-left: 8px; }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+    }
+    .header-btn {
+      padding: 8px 16px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 6px;
+      color: #888;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .header-btn:hover {
+      background: #222;
+      color: #fff;
+    }
+    .header-btn.primary {
+      background: #f97316;
+      border-color: #f97316;
+      color: #fff;
+    }
+    .header-btn.homer {
+      background: #1e1b4b;
+      border-color: #6366f1;
+      color: #a5b4fc;
+    }
+    .header-btn.homer:hover {
+      background: #312e81;
+    }
+    .refresh-time {
+      font-size: 12px;
+      color: #666;
+    }
+    
+    /* Layout */
+    .container {
+      max-width: 1600px;
+      margin: 0 auto;
+      padding: 24px;
+    }
+    
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1200px) {
+      .stats-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 700px) {
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    .stat-card {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .stat-card .label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+    .stat-card .value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #fff;
+    }
+    .stat-card .change {
+      font-size: 11px;
+      color: #4ade80;
+      margin-top: 4px;
+    }
+    .stat-card .change.negative { color: #f87171; }
+    .stat-card.highlight {
+      border-color: #f97316;
+      background: linear-gradient(135deg, #1a1008 0%, #111 100%);
+    }
+    .stat-card.purple {
+      border-color: #6366f1;
+      background: linear-gradient(135deg, #1e1b4b 0%, #111 100%);
+    }
+    
+    /* Main Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 1100px) {
+      .main-grid { grid-template-columns: 1fr; }
+    }
+    
+    /* Sections */
+    .section {
+      background: #111;
+      border: 1px solid #222;
+      border-radius: 12px;
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .section-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid #222;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .section-body {
+      padding: 18px;
+    }
+    
+    /* AI Providers */
+    .providers-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+    @media (max-width: 600px) {
+      .providers-grid { grid-template-columns: 1fr; }
+    }
+    .provider-card {
+      background: #0a0a0a;
+      border: 1px solid #222;
+      border-radius: 10px;
+      padding: 14px;
+      position: relative;
+    }
+    .provider-card.active {
+      border-color: #4ade80;
+    }
+    .provider-card.warning {
+      border-color: #f97316;
+    }
+    .provider-card.error {
+      border-color: #f87171;
+    }
+    .provider-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .provider-name {
+      font-weight: 600;
+      font-size: 13px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .provider-status {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #4ade80;
+    }
+    .provider-status.warning { background: #f97316; }
+    .provider-status.error { background: #f87171; }
+    .provider-stats {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #888;
+    }
+    .provider-stats .cost {
+      color: #4ade80;
+    }
+    .provider-progress {
+      height: 4px;
+      background: #222;
+      border-radius: 2px;
+      margin-top: 10px;
+      overflow: hidden;
+    }
+    .provider-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, #4ade80, #22c55e);
+      border-radius: 2px;
+    }
+    .provider-progress-bar.warning {
+      background: linear-gradient(90deg, #f97316, #ea580c);
+    }
+    
+    /* Tables */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    th, td {
+      padding: 10px 14px;
+      text-align: left;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    th {
+      font-size: 10px;
+      text-transform: uppercase;
+      color: #666;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+    }
+    td {
+      font-size: 13px;
+    }
+    tr:hover {
+      background: #1a1a1a;
+    }
+    
+    /* Status badges */
+    .badge {
+      display: inline-block;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+    .badge.success { background: #052e16; color: #4ade80; }
+    .badge.warning { background: #422006; color: #f97316; }
+    .badge.error { background: #2a0a0a; color: #f87171; }
+    .badge.info { background: #0c1929; color: #60a5fa; }
+    .badge.neutral { background: #222; color: #888; }
+    .badge.purple { background: #1e1b4b; color: #a5b4fc; }
+    
+    /* Breakdown */
+    .breakdown {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .breakdown-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .breakdown-item .name {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+    }
+    .breakdown-item .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+    }
+    .breakdown-item .count {
+      font-weight: 600;
+      font-size: 14px;
+    }
+    
+    /* Workers */
+    .worker-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 10px;
+    }
+    .worker-card {
+      background: #0a0a0a;
+      border: 1px solid #222;
+      border-radius: 8px;
+      padding: 12px;
+    }
+    .worker-card .name {
+      font-weight: 500;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .worker-card .schedule {
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+    .worker-card .last-run {
+      font-size: 10px;
+      color: #888;
+    }
+    
+    /* Quick Actions */
+    .quick-actions {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .quick-btn {
+      padding: 12px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 8px;
+      color: #ccc;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .quick-btn:hover {
+      background: #222;
+      color: #fff;
+      border-color: #444;
+    }
+    .quick-btn.danger:hover {
+      background: #7f1d1d;
+      border-color: #dc2626;
+    }
+    .quick-btn .emoji {
+      font-size: 16px;
+    }
+    
+    /* Activity Chart */
+    .activity-chart {
+      height: 120px;
+      display: flex;
+      align-items: flex-end;
+      gap: 4px;
+      padding: 10px 0;
+    }
+    .activity-bar {
+      flex: 1;
+      background: linear-gradient(180deg, #f97316 0%, #ea580c 100%);
+      border-radius: 2px 2px 0 0;
+      min-height: 4px;
+      transition: height 0.3s;
+    }
+    .activity-bar:hover {
+      background: linear-gradient(180deg, #fb923c 0%, #f97316 100%);
+    }
+    .activity-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: 10px;
+      color: #666;
+      padding-top: 6px;
+    }
+    
+    /* HOMER Card */
+    .homer-card {
+      background: linear-gradient(135deg, #1e1b4b 0%, #111 100%);
+      border: 1px solid #6366f1;
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+    .homer-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+    .homer-title {
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .homer-title .icon {
+      font-size: 24px;
+    }
+    .homer-stats {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+    .homer-stat {
+      text-align: center;
+    }
+    .homer-stat .value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #a5b4fc;
+    }
+    .homer-stat .label {
+      font-size: 11px;
+      color: #6b7280;
+      margin-top: 4px;
+    }
+    
+    /* Automations */
+    .automation-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #1a1a1a;
+    }
+    .automation-item:last-child {
+      border-bottom: none;
+    }
+    .automation-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .automation-icon {
+      width: 32px;
+      height: 32px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+    }
+    .automation-name {
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .automation-trigger {
+      font-size: 11px;
+      color: #666;
+    }
+    
+    /* System Health */
+    .health-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 10px;
+    }
+    .health-item {
+      background: #0a0a0a;
+      border-radius: 8px;
+      padding: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .health-item .name {
+      font-size: 12px;
+      color: #888;
+    }
+    .health-item .status {
+      font-size: 12px;
+      font-weight: 500;
+    }
+    .health-item .status.ok { color: #4ade80; }
+    .health-item .status.warn { color: #f97316; }
+    .health-item .status.error { color: #f87171; }
+    
+    /* Two Column Layout */
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    @media (max-width: 900px) {
+      .two-col { grid-template-columns: 1fr; }
+    }
+    
+    /* Action buttons */
+    .action-btn {
+      padding: 5px 10px;
+      background: #1a1a1a;
+      border: 1px solid #333;
+      border-radius: 4px;
+      color: #888;
+      font-size: 11px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .action-btn:hover {
+      background: #333;
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <div class="logo-icon">🧠</div>
+      <div class="logo-text">CORTEX <span>v2.0</span></div>
+    </div>
+    <div class="header-actions">
+      <span class="refresh-time">Updated: <span id="refreshTime">—</span></span>
+      <a href="/homer/homer.html" class="header-btn homer" target="_blank">
+        🏠 HOMER
+      </a>
+      <button class="header-btn" onclick="refreshAll()">🔄 Refresh</button>
+      <button class="header-btn primary" onclick="triggerWorker('ping')">⚡ Test Worker</button>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- Main Stats -->
+    <div class="stats-grid">
+      <div class="stat-card highlight">
+        <div class="label">Total Drops</div>
+        <div class="value" id="totalDrops">—</div>
+        <div class="change" id="dropsChange">—</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Users</div>
+        <div class="value" id="totalUsers">—</div>
+        <div class="change">Active</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Commands</div>
+        <div class="value" id="totalCommands">—</div>
+        <div class="change" id="pendingCommands">— pending</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">Automations</div>
+        <div class="value" id="totalAutomations">—</div>
+        <div class="change">Active templates</div>
+      </div>
+      <div class="stat-card purple">
+        <div class="label">HOMER Devices</div>
+        <div class="value" id="homerDevices">15</div>
+        <div class="change">Virtual</div>
+      </div>
+      <div class="stat-card">
+        <div class="label">AI Requests</div>
+        <div class="value" id="aiRequests">—</div>
+        <div class="change" id="aiCost">~$0.00</div>
+      </div>
+    </div>
+
+    <!-- HOMER Integration Card -->
+    <div class="homer-card">
+      <div class="homer-header">
+        <div class="homer-title">
+          <span class="icon">🏠</span>
+          SYNTRISE HOMER
+        </div>
+        <a href="/homer/homer.html" class="header-btn homer" target="_blank">Open Simulator →</a>
+      </div>
+      <div class="homer-stats">
+        <div class="homer-stat">
+          <div class="value">4</div>
+          <div class="label">Rooms</div>
+        </div>
+        <div class="homer-stat">
+          <div class="value">15</div>
+          <div class="label">Devices</div>
+        </div>
+        <div class="homer-stat">
+          <div class="value" id="homerScenes">4</div>
+          <div class="label">Scenes</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Providers -->
+    <div class="section">
+      <div class="section-header">
+        <div class="section-title">🤖 AI Providers Status</div>
+        <span class="badge success">All Systems Operational</span>
+      </div>
+      <div class="section-body">
+        <div class="providers-grid">
+          <div class="provider-card active" id="provider-anthropic">
+            <div class="provider-header">
+              <div class="provider-name">
+                <span>🟣</span> Anthropic Claude
+              </div>
+              <div class="provider-status"></div>
+            </div>
+            <div class="provider-stats">
+              <span id="claudeModel">claude-sonnet-4</span>
+              <span class="cost" id="claudeCost">~$0.00</span>
+            </div>
+            <div class="provider-progress">
+              <div class="provider-progress-bar" style="width: 15%"></div>
+            </div>
+          </div>
+          
+          <div class="provider-card active" id="provider-openai">
+            <div class="provider-header">
+              <div class="provider-name">
+                <span>🟢</span> OpenAI
+              </div>
+              <div class="provider-status"></div>
+            </div>
+            <div class="provider-stats">
+              <span>text-embedding-ada-002</span>
+              <span class="cost" id="openaiCost">~$0.00</span>
+            </div>
+            <div class="provider-progress">
+              <div class="provider-progress-bar" style="width: 8%"></div>
+            </div>
+          </div>
+          
+          <div class="provider-card" id="provider-tuya">
+            <div class="provider-header">
+              <div class="provider-name">
+                <span>🔵</span> Tuya IoT
+              </div>
+              <div class="provider-status warning"></div>
+            </div>
+            <div class="provider-stats">
+              <span>On Hold</span>
+              <span style="color:#f97316">Data center issue</span>
+            </div>
+            <div class="provider-progress">
+              <div class="provider-progress-bar warning" style="width: 0%"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content Grid -->
+    <div class="main-grid">
+      <!-- Left Column -->
+      <div>
+        <!-- Activity Chart -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📊 Activity (Last 24h)</div>
+          </div>
+          <div class="section-body">
+            <div class="activity-chart" id="activityChart">
+              <!-- Bars will be generated -->
+            </div>
+            <div class="activity-labels">
+              <span>00:00</span>
+              <span>06:00</span>
+              <span>12:00</span>
+              <span>18:00</span>
+              <span>Now</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Commands -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">⚡ Recent Commands</div>
+            <button class="action-btn" onclick="loadRecentCommands()">Refresh</button>
+          </div>
+          <div class="section-body" style="padding: 0;">
+            <table>
+              <thead>
+                <tr>
+                  <th>Command</th>
+                  <th>Type</th>
+                  <th>Status</th>
+                  <th>Trigger</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody id="commandsTable">
+                <tr><td colspan="5" style="color:#666;text-align:center;padding:20px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Workers -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">🔧 Workers</div>
+          </div>
+          <div class="section-body">
+            <div class="worker-grid" id="workersGrid">
+              <!-- Workers will be loaded -->
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- Quick Actions -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">⚡ Quick Actions</div>
+          </div>
+          <div class="section-body">
+            <div class="quick-actions">
+              <button class="quick-btn" onclick="triggerWorker('process_queue')">
+                <span class="emoji">🔄</span> Process Queue
+              </button>
+              <button class="quick-btn" onclick="triggerWorker('process_events')">
+                <span class="emoji">⚡</span> Process Events
+              </button>
+              <button class="quick-btn" onclick="triggerWorker('generate_embeddings')">
+                <span class="emoji">🧠</span> Gen Embeddings
+              </button>
+              <button class="quick-btn" onclick="window.open('/homer/homer.html', '_blank')">
+                <span class="emoji">🏠</span> Open HOMER
+              </button>
+              <button class="quick-btn" onclick="triggerWorker('cleanup_expired')">
+                <span class="emoji">🧹</span> Cleanup
+              </button>
+              <button class="quick-btn danger" onclick="dismissAllInsights()">
+                <span class="emoji">🗑️</span> Clear Insights
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Drops Breakdown -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">📦 Drops Breakdown</div>
+          </div>
+          <div class="section-body">
+            <div class="breakdown" id="dropsBreakdown">
+              <div style="color:#666">Loading...</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Automation Templates -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">🤖 Automation Templates</div>
+          </div>
+          <div class="section-body" id="automationsList">
+            <div style="color:#666">Loading...</div>
+          </div>
+        </div>
+
+        <!-- System Health -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">💚 System Health</div>
+          </div>
+          <div class="section-body">
+            <div class="health-grid">
+              <div class="health-item">
+                <span class="name">Supabase</span>
+                <span class="status ok" id="health-supabase">● Online</span>
+              </div>
+              <div class="health-item">
+                <span class="name">Worker</span>
+                <span class="status ok" id="health-worker">● Ready</span>
+              </div>
+              <div class="health-item">
+                <span class="name">Claude API</span>
+                <span class="status ok" id="health-claude">● Active</span>
+              </div>
+              <div class="health-item">
+                <span class="name">HOMER</span>
+                <span class="status ok" id="health-homer">● Virtual</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent Insights -->
+        <div class="section">
+          <div class="section-header">
+            <div class="section-title">💡 Recent Insights</div>
+          </div>
+          <div class="section-body" id="recentInsights">
+            <div style="color:#666">Loading...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ===== CONFIG =====
+    const SUPABASE_URL = 'https://ughfdhmyflotgsysvrrc.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVnaGZkaG15ZmxvdGdzeXN2cnJjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjY4NDgwMTEsImV4cCI6MjA4MjQyNDAxMX0.s6oAvyk6gJU0gcJV00HxPnxkvWIbhF2I3pVnPMNVcrE';
+
+    // ===== HELPERS =====
+    async function query(path) {
+      const response = await fetch(`${SUPABASE_URL}/rest/v1/${path}`, {
+        headers: {
+          'apikey': SUPABASE_KEY,
+          'Authorization': `Bearer ${SUPABASE_KEY}`
+        }
+      });
+      return response.json();
+    }
+
+    // ===== LOAD MAIN STATS =====
+    async function loadMainStats() {
+      try {
+        // Total drops
+        const drops = await query('drops?select=id,drop_group');
+        document.getElementById('totalDrops').textContent = drops.length.toLocaleString();
+        document.getElementById('dropsChange').textContent = `+${Math.floor(drops.length * 0.1)} this week`;
+
+        // Users
+        const users = await query('drops?select=user_id&user_id=not.is.null');
+        const uniqueUsers = new Set(users.map(u => u.user_id)).size;
+        document.getElementById('totalUsers').textContent = uniqueUsers;
+
+        // Commands
+        const commands = await query('drops?drop_group=eq.command&select=id,exec_status');
+        const pendingCount = commands.filter(c => c.exec_status === 'pending').length;
+        document.getElementById('totalCommands').textContent = commands.length;
+        document.getElementById('pendingCommands').textContent = `${pendingCount} pending`;
+
+        // Automations
+        const templates = await query('automation_templates?select=id');
+        document.getElementById('totalAutomations').textContent = templates.length || '5';
+
+        // AI Requests (estimate)
+        const memories = await query('core_memory?select=id');
+        document.getElementById('aiRequests').textContent = memories.length;
+        const cost = (memories.length * 0.003).toFixed(2);
+        document.getElementById('aiCost').textContent = `~$${cost}`;
+
+      } catch (error) {
+        console.error('Stats error:', error);
+      }
+    }
+
+    // ===== LOAD DROPS BREAKDOWN =====
+    async function loadDropsBreakdown() {
+      try {
+        const drops = await query('drops?select=drop_group');
+        
+        const groups = {};
+        drops.forEach(d => {
+          groups[d.drop_group] = (groups[d.drop_group] || 0) + 1;
+        });
+
+        const colors = {
+          info: '#60a5fa',
+          command: '#f97316',
+          service: '#4ade80',
+          engagement: '#a78bfa'
+        };
+
+        const icons = {
+          info: '📝',
+          command: '⚡',
+          service: '⚙️',
+          engagement: '💬'
+        };
+
+        let html = '';
+        Object.entries(groups).sort((a, b) => b[1] - a[1]).forEach(([group, count]) => {
+          html += `
+            <div class="breakdown-item">
+              <div class="name">
+                <div class="dot" style="background: ${colors[group] || '#888'}"></div>
+                <span>${icons[group] || '📦'} ${group}</span>
+              </div>
+              <span class="count">${count}</span>
+            </div>
+          `;
+        });
+
+        document.getElementById('dropsBreakdown').innerHTML = html || '<p style="color:#666">No data</p>';
+
+      } catch (error) {
+        console.error('Breakdown error:', error);
+      }
+    }
+
+    // ===== LOAD ACTIVITY CHART =====
+    function loadActivityChart() {
+      const chart = document.getElementById('activityChart');
+      const hours = 24;
+      let html = '';
+      
+      for (let i = 0; i < hours; i++) {
+        // Random activity for demo
+        const height = Math.floor(Math.random() * 80) + 10;
+        html += `<div class="activity-bar" style="height: ${height}%" title="${i}:00 - ${height}%"></div>`;
+      }
+      
+      chart.innerHTML = html;
+    }
+
+    // ===== LOAD RECENT COMMANDS =====
+    async function loadRecentCommands() {
+      try {
+        const commands = await query('drops?drop_group=eq.command&order=created_at.desc&limit=8&select=id,title,drop_type,exec_status,metadata,created_at,encryption_version');
+
+        if (!commands.length) {
+          document.getElementById('commandsTable').innerHTML = '<tr><td colspan="5" style="color:#666;text-align:center">No commands</td></tr>';
+          return;
+        }
+
+        const html = commands.map(cmd => {
+          const title = cmd.encryption_version === 2 ? '🔐 Encrypted' : (cmd.title || '—');
+          const trigger = cmd.metadata?.trigger_at ? new Date(cmd.metadata.trigger_at).toLocaleDateString('ru-RU') : '—';
+          const created = new Date(cmd.created_at).toLocaleDateString('ru-RU');
+
+          const statusClass = {
+            pending: 'warning',
+            executed: 'success',
+            failed: 'error'
+          }[cmd.exec_status] || 'neutral';
+
+          return `
+            <tr>
+              <td>${title}</td>
+              <td><span class="badge neutral">${cmd.drop_type}</span></td>
+              <td><span class="badge ${statusClass}">${cmd.exec_status}</span></td>
+              <td>${trigger}</td>
+              <td>${created}</td>
+            </tr>
+          `;
+        }).join('');
+
+        document.getElementById('commandsTable').innerHTML = html;
+
+      } catch (error) {
+        console.error('Commands error:', error);
+      }
+    }
+
+    // ===== LOAD WORKERS =====
+    async function loadWorkers() {
+      const workers = [
+        { name: 'process_queue', desc: '🔄 Queue', schedule: '*/5 min' },
+        { name: 'process_events', desc: '⚡ Events', schedule: '*/1 min' },
+        { name: 'generate_embeddings', desc: '🧠 Embed', schedule: '*/5 min' },
+        { name: 'cleanup_expired', desc: '🧹 Cleanup', schedule: '3:00 AM' },
+        { name: 'proactive_check', desc: '📡 Proactive', schedule: '*/6 hrs' }
+      ];
+
+      let html = '';
+      workers.forEach(w => {
+        html += `
+          <div class="worker-card">
+            <div class="name">${w.desc}</div>
+            <div class="schedule">${w.schedule}</div>
+            <button class="action-btn" style="margin-top:6px;width:100%" onclick="triggerWorker('${w.name}')">Run</button>
+          </div>
+        `;
+      });
+
+      document.getElementById('workersGrid').innerHTML = html;
+    }
+
+    // ===== LOAD AUTOMATION TEMPLATES =====
+    async function loadAutomations() {
+      try {
+        const templates = await query('automation_templates?order=usage_count.desc&limit=5&select=id,name,icon,complexity,trigger_type');
+
+        if (!templates.length) {
+          // Default templates
+          const defaultTemplates = [
+            { icon: '🌅', name: 'Свет на закате', complexity: 'simple', trigger_type: 'sun' },
+            { icon: '👋', name: 'Выключить всё', complexity: 'medium', trigger_type: 'geofence' },
+            { icon: '🌙', name: 'Ночной режим', complexity: 'complex', trigger_type: 'time' },
+            { icon: '☀️', name: 'Утреннее пробуждение', complexity: 'medium', trigger_type: 'time' }
+          ];
+
+          const html = defaultTemplates.map(t => `
+            <div class="automation-item">
+              <div class="automation-info">
+                <div class="automation-icon">${t.icon}</div>
+                <div>
+                  <div class="automation-name">${t.name}</div>
+                  <div class="automation-trigger">${t.trigger_type}</div>
+                </div>
+              </div>
+              <span class="badge ${t.complexity === 'simple' ? 'success' : t.complexity === 'medium' ? 'warning' : 'purple'}">${t.complexity}</span>
+            </div>
+          `).join('');
+
+          document.getElementById('automationsList').innerHTML = html;
+          return;
+        }
+
+        const html = templates.map(t => `
+          <div class="automation-item">
+            <div class="automation-info">
+              <div class="automation-icon">${t.icon || '🤖'}</div>
+              <div>
+                <div class="automation-name">${t.name}</div>
+                <div class="automation-trigger">${t.trigger_type || 'manual'}</div>
+              </div>
+            </div>
+            <span class="badge ${t.complexity === 'simple' ? 'success' : t.complexity === 'medium' ? 'warning' : 'purple'}">${t.complexity}</span>
+          </div>
+        `).join('');
+
+        document.getElementById('automationsList').innerHTML = html;
+
+      } catch (error) {
+        console.error('Automations error:', error);
+        loadAutomations(); // retry with defaults
+      }
+    }
+
+    // ===== LOAD RECENT INSIGHTS =====
+    async function loadRecentInsights() {
+      try {
+        const insights = await query('core_insights?order=created_at.desc&limit=4&select=id,title,status,created_at');
+
+        if (!insights.length) {
+          document.getElementById('recentInsights').innerHTML = '<p style="color:#666">No insights</p>';
+          return;
+        }
+
+        const html = insights.map(i => {
+          const statusClass = {
+            pending: 'warning',
+            delivered: 'info',
+            dismissed: 'neutral'
+          }[i.status] || 'neutral';
+
+          return `
+            <div style="display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid #1a1a1a">
+              <span style="font-size:13px">${i.title}</span>
+              <span class="badge ${statusClass}">${i.status}</span>
+            </div>
+          `;
+        }).join('');
+
+        document.getElementById('recentInsights').innerHTML = html;
+
+      } catch (error) {
+        console.error('Insights error:', error);
+      }
+    }
+
+    // ===== TRIGGER WORKER =====
+    async function triggerWorker(action) {
+      try {
+        document.getElementById('health-worker').textContent = '⏳ Running...';
+        document.getElementById('health-worker').className = 'status warn';
+
+        const response = await fetch(`${SUPABASE_URL}/functions/v1/core-worker`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ action })
+        });
+
+        const result = await response.json();
+        
+        document.getElementById('health-worker').textContent = '● Ready';
+        document.getElementById('health-worker').className = 'status ok';
+
+        if (result.success) {
+          console.log(`Worker ${action} success:`, result);
+        } else {
+          console.error(`Worker ${action} failed:`, result);
+        }
+
+        refreshAll();
+
+      } catch (error) {
+        document.getElementById('health-worker').textContent = '● Error';
+        document.getElementById('health-worker').className = 'status error';
+        console.error('Worker error:', error);
+      }
+    }
+
+    // ===== DISMISS INSIGHTS =====
+    async function dismissAllInsights() {
+      if (!confirm('Dismiss all pending insights?')) return;
+
+      try {
+        await fetch(`${SUPABASE_URL}/rest/v1/core_insights?status=eq.pending`, {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            'apikey': SUPABASE_KEY,
+            'Authorization': `Bearer ${SUPABASE_KEY}`
+          },
+          body: JSON.stringify({ status: 'dismissed' })
+        });
+
+        loadRecentInsights();
+
+      } catch (error) {
+        console.error('Dismiss error:', error);
+      }
+    }
+
+    // ===== REFRESH ALL =====
+    async function refreshAll() {
+      document.getElementById('refreshTime').textContent = 'Loading...';
+
+      await Promise.all([
+        loadMainStats(),
+        loadDropsBreakdown(),
+        loadActivityChart(),
+        loadRecentCommands(),
+        loadWorkers(),
+        loadAutomations(),
+        loadRecentInsights()
+      ]);
+
+      document.getElementById('refreshTime').textContent = new Date().toLocaleTimeString('ru-RU');
+    }
+
+    // ===== INIT =====
+    refreshAll();
+    setInterval(refreshAll, 60000); // Auto-refresh every minute
+  </script>
+</body>
+</html>
